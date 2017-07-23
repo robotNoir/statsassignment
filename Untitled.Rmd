@@ -1,0 +1,85 @@
+---
+title: "Stats Assignment"
+date: 22-07-2017
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(data.table)
+library(tables)
+library(ggplot2)
+library(gridExtra)
+
+# Import data file from csv and clean data
+data <- read.csv('question1CSV.csv', header=T)
+
+```
+
+## Question 1
+### Summary Table for Study Participants Risk Factors
+**Factor** | **Summary**
+------------------------|:-----------------:
+**Age**, years (range, mean (sd))   | `r min(data$Age)`-`r max(data$Age)`, `r round(mean(data$Age), 2)` (`r round(sd(data$Age), 2)`)
+**Gender**, n (%)                         |
+  *Male*                                  | `r summary(data$Gender)['male']` (`r round(100*summary(data$Gender)['male']/length(data$Gender), 1)`)
+  *Female*                                | `r summary(data$Gender)['female']` (`r round(100*summary(data$Gender)['female']/length(data$Gender), 1)`)
+**Diabetes**, n (%)                       | `r summary(data$Diabetes)['yes']` (`r round(100*summary(data$Diabetes)['yes']/length(data$Diabetes), 1)`)
+**Smoker**, n (%)                         | `r summary(data$Ever.smoked)['yes']` (`r round(100*summary(data$Ever.smoked)['yes']/length(data$Ever.smoked), 1)`)
+**Peripheral Vascular Disease**, n (%)    | `r summary(data$PVD)['yes']` (`r round(100*summary(data$PVD)['yes']/length(data$PVD), 1)`)
+**Cerebrovascular Disease**, n (%)        | `r summary(data$CVD)['yes']` (`r round(100*summary(data$CVD)['yes']/length(data$CVD), 1)`)
+**Hypercholestrolemia**, n (%)            | `r summary(data$Hypertension)['yes']` (`r round(100*summary(data$Hypertension)['yes']/length(data$Hypertension), 1)`)
+
+### Comparison of Indicies for Severity of Disease in Radial Artery for Smokers and Non-Smokers
+```{r part(b), echo=FALSE} 
+# Generate three boxplots to compar main indicies for disease severity for radial artery depending on whether patient has ever smoked.
+# plot1 - radial artery luminal narrowing depending on smoker
+# plot2 - radial artery intimal thickness index depending on smoker
+# plot3 - radial artery intima to media ratio depending on smoker
+
+    plot1 <- ggplot(data, aes(Ever.smoked,RA.Luminal.narrowing....)) + 
+    geom_boxplot() + 
+    coord_flip() +
+    theme_bw() +
+    labs(
+      y="Luminal Narrowing (%)", 
+      x="Smoker?")
+  
+  plot2 <- ggplot(data, aes(Ever.smoked,RA.Intimal.thickness.index)) + 
+    geom_boxplot() + 
+    coord_flip() +
+    theme_bw(base_size = 10) +
+    labs(
+      y="Intimal Thickness Index", 
+      x="Smoker?")
+  
+  plot3 <- ggplot(data, aes(Ever.smoked,RA.Intima.to.media.ratio)) + 
+    geom_boxplot() + 
+    coord_flip() +
+    theme_bw() +
+    labs(
+      y="Intima-to-Media Ratio", 
+      x="Smoker?")
+  
+  blank <- ggplot() + theme_void()
+  
+  # Using gridExtra package to generate all three plots into one image
+  grid.arrange(plot1, blank, plot2, blank, plot3, heights=c(0.30, 0.05, 0.30, 0.05, 0.3), ncol=1)
+  
+```
+
+
+```{r ttests, echo=FALSE}
+  # part (c) - boxplot display of 
+  ttest1 <- t.test(data$RA.Luminal.narrowing.... ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
+  ttest2 <- t.test(data$RA.Intimal.thickness.index ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
+  ttest3 <- t.test(data$RA.Intima.to.media.ratio ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
+```  
+ 
+Indice                  | Difference     | 95% CI  | t-value | p-value
+----------------------- | ----------- | -------------------- | -------- | -------
+Luminal Narrowing (%)   | `r ttest1$estimate[1]-ttest1$estimate[2]` | `r ttest1$conf.int` | `r ttest1$statistic` | `r ttest1$p.value`           
+Intimal Thickness Index | `r ttest2$estimate[1]-ttest2$estimate[2]` | `r ttest2$conf.int` | `r ttest2$statistic` | `r ttest2$p.value`  
+Intima-to-Media Ratio   | `r ttest3$estimate[1]-ttest3$estimate[2]` | `r ttest3$conf.int` | `r ttest3$statistic` | `r ttest3$p.value` 
+
