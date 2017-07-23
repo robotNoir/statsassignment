@@ -117,3 +117,32 @@ data <- read.csv('artery030510.csv', header=T)
   t.test(data$"RA.Luminal.narrowing.(%)" ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
   t.test(data$RA.Intimal.thickness.index ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
   t.test(data$"RA.Intima-to-media.ratio" ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
+  
+  plot1 <- ggplot(data, aes(Ever.smoked,RA.Luminal.narrowing....)) + 
+    geom_boxplot() + 
+    coord_flip() +
+    theme_light() +
+    labs(
+      title = "Comparison of Radial Artery Main Indicies for Smokers and Non-Smokers",
+      y="Intima-to-Media Ratio", 
+      x="Patient History of Smoking")
+  
+  plot2 <- ggplot(data, aes(Ever.smoked,RA.Intimal.thickness.index)) + 
+    geom_boxplot() + 
+    coord_flip() +
+    theme_light() +
+    labs(
+      title = "Comparison of Radial Artery Main Indicies for Smokers and Non-Smokers", 
+      y="Intima-to-Media Ratio", 
+      x="Patient History of Smoking")
+  
+  plot3 <- ggplot(data, aes(Ever.smoked,RA.Intima.to.media.ratio)) + 
+    geom_boxplot() + 
+    coord_flip() +
+    theme_light() +
+    labs(
+      title = "Comparison of Radial Artery Main Indicies for Smokers and Non-Smokers",
+      y="Intima-to-Media Ratio", 
+      x="Patient History of Smoking")
+  
+  grid.arrange(plot1, plot2, plot3, ncol=1)
