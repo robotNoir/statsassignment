@@ -74,6 +74,10 @@ data <- read.csv('artery030510.csv', header=T)
   levels(data$RA.intimal.abnormality) <- c('normal', 'intimal thickening', 'atherosclerosis')
   levels(data$ITA.intimal.abnormality) <- c('normal', 'intimal thickening', 'atherosclerosis')
   
+  #Export fixed csv 
+  write.csv(data, 'question1CSV.csv')
+  
+  # --------------------------------------------------------------------------------------------
   
   # part (b) - boxplot display of RA luminal narrowing, intimal thickness and intima-media ratio depending on ever smoked
   par(mfrow=c(3,1))
