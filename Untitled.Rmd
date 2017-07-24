@@ -8,9 +8,9 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(data.table)
-library(tables)
 library(ggplot2)
 library(gridExtra)
+library(extrafont)
 
 # Import data file from csv and clean data
 data <- read.csv('question1CSV.csv', header=T)
@@ -41,26 +41,36 @@ data <- read.csv('question1CSV.csv', header=T)
     plot1 <- ggplot(data, aes(Ever.smoked,RA.Luminal.narrowing....)) + 
     geom_boxplot() + 
     coord_flip() +
-    theme_bw() +
+    theme_bw(base_size = 8) +
+    scale_x_discrete(labels=c("No","Yes")) +
+    scale_y_continuous(breaks = seq(0, 70, 10), limits=c(0,70), expand=c(0,0)) +
     labs(
       y="Luminal Narrowing (%)", 
       x="Smoker?")
+  ggsave("plot1.1.tiff", height=4.6, width=17, units="cm", dpi=600)
   
   plot2 <- ggplot(data, aes(Ever.smoked,RA.Intimal.thickness.index)) + 
     geom_boxplot() + 
     coord_flip() +
-    theme_bw(base_size = 10) +
+    theme_bw(base_size = 8) +
+    scale_x_discrete(labels=c("No","Yes")) +
+    scale_y_continuous(breaks = seq(0, 2, 0.2), limits=c(0,2), expand=c(0,0)) +
     labs(
       y="Intimal Thickness Index", 
       x="Smoker?")
+  ggsave("plot1.2.tiff", height=4.6, width=17, units="cm", dpi=600)
   
   plot3 <- ggplot(data, aes(Ever.smoked,RA.Intima.to.media.ratio)) + 
     geom_boxplot() + 
     coord_flip() +
-    theme_bw() +
+    theme_bw(base_size = 8) +
+    scale_x_discrete(labels=c("No","Yes")) +
+    scale_y_continuous(breaks = seq(0, 11, 1), limits=c(0,11), expand=c(0,0)) +
     labs(
       y="Intima-to-Media Ratio", 
       x="Smoker?")
+  ggsave("plot1.3.tiff", height=4.6, width=17, units="cm", dpi=600)
+  
   
   blank <- ggplot() + theme_void()
   
@@ -76,10 +86,42 @@ data <- read.csv('question1CSV.csv', header=T)
   ttest2 <- t.test(data$RA.Intimal.thickness.index ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
   ttest3 <- t.test(data$RA.Intima.to.media.ratio ~ data$Ever.smoked, var.equal=T, conf.level=0.95)
 ```  
- 
-Indice                  | Difference     | 95% CI  | t-value | p-value
------------------------ | ----------- | -------------------- | -------- | -------
-Luminal Narrowing (%)   | `r ttest1$estimate[1]-ttest1$estimate[2]` | `r ttest1$conf.int` | `r ttest1$statistic` | `r ttest1$p.value`           
-Intimal Thickness Index | `r ttest2$estimate[1]-ttest2$estimate[2]` | `r ttest2$conf.int` | `r ttest2$statistic` | `r ttest2$p.value`  
-Intima-to-Media Ratio   | `r ttest3$estimate[1]-ttest3$estimate[2]` | `r ttest3$conf.int` | `r ttest3$statistic` | `r ttest3$p.value` 
 
+### Difference between Smokers and Non-Smokers on each Index of Disease Severity for Radial Artery
+**Two Sample t-test: Non-smoker - Smoker**
+
+Disease Severity Indicies  | Difference | 95% CI  | t-value | p-value
+-------------------------- | ------------------ | ----------- | -------- | -------
+Luminal Narrowing (%)      | `r round(ttest1$estimate[1]-ttest1$estimate[2],3)` | `r round(ttest1$conf.int,3)` | `r round(ttest1$statistic,3)` | `r round(ttest1$p.value,3)`
+Intimal Thickness Index    | `r round(ttest2$estimate[1]-ttest2$estimate[2],3)` | `r round(ttest2$conf.int,3)` | `r round(ttest2$statistic,3)` | `r round(ttest2$p.value,3)`  
+Intima-to-Media Ratio      | `r round(ttest3$estimate[1]-ttest3$estimate[2],3)` | `r round(ttest3$conf.int,3)` | `r round(ttest3$statistic,3)` | `r round(ttest3$p.value,3)` 
+
+
+-------------------------------------------------------------
+                         Mean (st. dev)
+                         Smoker
+----------------------- ---------------- --------------- -------------------------
+Luminal Narrowing (%)   
+Intima Thickness Index
+Intima-to-Media Ratio
+-------------------------------------------------------------
+```{r table}
+
+differences <- data.frame(x = c('Luminal Narrowing (%)', 'Intima Thickness Index', 'Intima-to-Media Ratio'), min=c(-0.164, -0.053, -0.607), max=c(8.766, 0.119, 0.502), diff=c(4.301, 0.033, -0.053))
+
+plot4 <- ggplot(differences, aes(x, diff)) + 
+         geom_hline(yintercept=0, size=0.3) +
+         geom_point(aes(x, diff, color="red")) +
+         geom_errorbar(aes(x, ymin = min, ymax = max, color="red")) +
+         coord_flip() +
+         theme_bw(base_size = 8) +
+         scale_y_continuous(breaks = seq(-1, 9, 1), limits=c(-1,9), expand=c(0,0)) +
+         guides(color=FALSE) +
+         labs(
+           y='Difference in Means (Smoker - Non-Smoker)', 
+           x='Indicies for Disease Severity')
+
+plot4
+ggsave("plot1.4.tiff", height=5.9, width=15.73, units="cm", dpi=600)
+
+```

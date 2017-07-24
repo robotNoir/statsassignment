@@ -146,3 +146,4 @@ data <- read.csv('artery030510.csv', header=T)
       x="Patient History of Smoking")
   
   grid.arrange(plot1, plot2, plot3, ncol=1)
+  
